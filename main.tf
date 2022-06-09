@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = ">= 4.0.0"
     }
   }
@@ -23,22 +23,22 @@ locals {
   pipeline_spec = yamldecode(local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content : file(var.pipeline_spec_path))
 
   # If var.kms_key_name is provided, construct the encryption_spec object
-  encryption_spec = (var.kms_key_name == null) ? null : {"kmsKeyName": var.kms_key_name}
+  encryption_spec = (var.kms_key_name == null) ? null : { "kmsKeyName" : var.kms_key_name }
 
   # Construct the PipelineJob object
   # https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.pipelineJobs
   pipeline_job = {
-      displayName = var.display_name
-      pipelineSpec = local.pipeline_spec
-      labels = var.labels
-      runtimeConfig = {
-          parameterValues = var.parameter_values
-          gcsOutputDirectory = var.gcs_output_directory
+    displayName  = var.display_name
+    pipelineSpec = local.pipeline_spec
+    labels       = var.labels
+    runtimeConfig = {
+      parameterValues    = var.parameter_values
+      gcsOutputDirectory = var.gcs_output_directory
 
-      }
-      encryptionSpec = local.encryption_spec
-      serviceAccount = var.vertex_service_account_email
-      network = var.network
+    }
+    encryptionSpec = local.encryption_spec
+    serviceAccount = var.vertex_service_account_email
+    network        = var.network
 
   }
 
@@ -47,15 +47,15 @@ locals {
 # If var.pipeline_spec_path is a GCS path
 # Load the pipeline spec from the GCS path
 data "google_storage_bucket_object_content" "pipeline_spec" {
-  count = local.pipeline_spec_path_is_gcs_path ? 1 : 0
-  name = join("/", slice(local.pipeline_spec_path_no_gcs_prefix_parts, 1, length(local.pipeline_spec_path_no_gcs_prefix_parts)))
+  count  = local.pipeline_spec_path_is_gcs_path ? 1 : 0
+  name   = join("/", slice(local.pipeline_spec_path_no_gcs_prefix_parts, 1, length(local.pipeline_spec_path_no_gcs_prefix_parts)))
   bucket = local.pipeline_spec_path_no_gcs_prefix_parts[0]
 }
 
 # If a service account is not specified for Cloud Scheduler, use the default compute service account
 data "google_compute_default_service_account" "default" {
-    count = (var.cloud_scheduler_sa_email == null) ? 1 : 0
-    project = var.project
+  count   = (var.cloud_scheduler_sa_email == null) ? 1 : 0
+  project = var.project
 }
 
 resource "google_cloud_scheduler_job" "job" {
