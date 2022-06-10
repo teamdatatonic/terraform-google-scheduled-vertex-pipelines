@@ -15,7 +15,7 @@ variable "cloud_scheduler_region" {
 
 variable "display_name" {
   type        = string
-  default     = null # TODO check this works
+  default     = null
   description = "The display name of the Pipeline. The name can be up to 128 characters long and can be consist of any UTF-8 characters."
 }
 
