@@ -29,6 +29,14 @@ jobs:
 
             This module is available in the [Datatonic Terraform Registry](https://registry.terraform.io/namespaces/teamdatatonic).
 
+            ## Examples
+
+            ### Local pipeline definition
+
+            ```hcl
+            {{ include "examples/hello_world_local/main.tf" }}
+            ```
+            
             ## Limitations
 
             ### Pipeline job names
