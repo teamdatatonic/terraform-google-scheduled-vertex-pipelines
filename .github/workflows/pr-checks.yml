@@ -23,4 +23,5 @@ jobs:
           output-file: README.md
           output-method: inject
           config-file: .terraform-docs.yml
+          template: disabled
           git-push: "true"
