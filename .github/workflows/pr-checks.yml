@@ -31,11 +31,7 @@ jobs:
 
             ## Examples
 
-            ### Local pipeline definition
-
-            ```hcl
-            {{ include "examples/hello_world_local/main.tf" }}
-            ```
+            Check out the the [examples directory](./examples).
             
             ## Limitations
 
