@@ -1,0 +1,21 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+      
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Run pre-commit checks
+        run: |
+          
+          pip3 install pre-commit
+          pre-commit run --all-files 
