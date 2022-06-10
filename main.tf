@@ -68,7 +68,7 @@ resource "google_cloud_scheduler_job" "job" {
   region           = var.cloud_scheduler_region
 
   retry_config {
-    retry_count = 1
+    retry_count = var.cloud_scheduler_retry_count
   }
 
   http_target {

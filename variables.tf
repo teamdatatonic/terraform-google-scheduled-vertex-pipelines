@@ -92,3 +92,9 @@ variable "cloud_scheduler_job_attempt_deadline" {
   default     = "320s"
   description = "The deadline for Cloud Scheduler job attempts. If the request handler does not respond by this deadline then the request is cancelled and the attempt is marked as a DEADLINE_EXCEEDED failure. The failed attempt can be viewed in execution logs. Cloud Scheduler will retry the job according to the RetryConfig. The allowed duration for this deadline is between 15 seconds and 30 minutes. A duration in seconds with up to nine fractional digits, terminated by 's'. Example: \"3.5s\""
 }
+
+variable "cloud_scheduler_retry_count" {
+  type        = number
+  default     = 1
+  description = "The number of attempts that the system will make to run a Cloud Scheduler job using the exponential backoff procedure described by maxDoublings. Values greater than 5 and negative values are not allowed."
+}
