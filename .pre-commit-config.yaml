@@ -16,9 +16,3 @@ repos:
     rev: 2.1.6
     hooks:
       - id: git-dirty
-
-  - repo: https://github.com/terraform-docs/terraform-docs
-    rev: "v0.16.0"
-    hooks:
-      - id: terraform-docs-go
-        args: ["markdown", "table", "--output-file", "README.md", "."]
