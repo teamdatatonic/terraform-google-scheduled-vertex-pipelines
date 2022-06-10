@@ -4,6 +4,10 @@ This repo contains a Terraform module for scheduling a Vertex Pipeline using Goo
 
 This module is available in the [Datatonic Terraform Registry](https://registry.terraform.io/namespaces/teamdatatonic).
 
+## Examples
+
+Check out the the [examples directory](./examples).
+
 ## Limitations
 
 ### Pipeline job names
