@@ -20,7 +20,7 @@ Pipeline jobs created using this Terraform module instead just have the numeric 
 
 ### Caching
 
-Using the SDK, you can override the caching behavious for Vertex Pipeline steps. This feature is not available in the HTTP API used by this module.
+Using the SDK, you can override the caching behaviour for Vertex Pipeline steps. This feature is not available in the HTTP API used by this module.
 Instead, you can specify the caching behaviour in your actual pipeline definition.
 
 ## Development
