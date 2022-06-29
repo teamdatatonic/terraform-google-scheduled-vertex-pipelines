@@ -62,4 +62,5 @@ jobs:
             You can customise the template (including this text for example) in `.github/workflows/pr-checks.yml`.
 
             {{ .Content }}
+            
           git-push: "true"
