@@ -16,6 +16,18 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
+      - uses: actions/cache@v2
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - uses: terraform-linters/setup-tflint@v2.0.0
+        name: Setup TFLint
+
+      - uses: pre-commit/action@v3.0.0
+        name: Pre-commit checks
+
       - name: Render terraform docs and push changes back to PR
         uses: terraform-docs/gh-actions@main
         with:
