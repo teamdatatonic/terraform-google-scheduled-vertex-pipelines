@@ -41,12 +41,14 @@ You can customise the template (including this text for example) in `.github/wor
 | Name | Version |
 |------|---------|
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.0.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | >= 2.2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 4.0.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.27.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 2.2.0 |
 
 ## Modules
 
@@ -57,8 +59,10 @@ No modules.
 | Name | Type |
 |------|------|
 | [google_cloud_scheduler_job.job](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_scheduler_job) | resource |
+| [google_client_config.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
 | [google_compute_default_service_account.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_default_service_account) | data source |
 | [google_storage_bucket_object_content.pipeline_spec](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_bucket_object_content) | data source |
+| [http_http.pipeline_spec](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 
