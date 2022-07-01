@@ -28,6 +28,43 @@ jobs:
       - uses: pre-commit/action@v3.0.0
         name: Pre-commit checks
 
+  terratest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Go 1.18
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.18
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: Run Terratest
+        run: make test
+        env:
+          TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
+
+  generate-readme:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
       - name: Render terraform docs and push changes back to PR
         uses: terraform-docs/gh-actions@main
         with:

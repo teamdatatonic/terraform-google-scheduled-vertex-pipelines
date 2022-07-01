@@ -1,17 +1,17 @@
 module "hello_world_pipeline" {
   source                 = "../../"
-  project                = "my-gcp-project-id"
-  vertex_region          = "europe-west2"
-  cloud_scheduler_region = "europe-west2"
-  pipeline_spec_path     = "pipeline.json"
+  project                = var.project
+  vertex_region          = var.vertex_region
+  cloud_scheduler_region = var.cloud_scheduler_region
+  pipeline_spec_path     = var.pipeline_spec_path
   parameter_values = {
     "text" = "Hello, world!"
   }
-  gcs_output_directory         = "gs://my-bucket/my-output-directory"
-  vertex_service_account_email = "my-vertex-service-account@my-gcp-project-id.iam.gserviceaccount.com"
+  gcs_output_directory         = var.gcs_output_directory
+  vertex_service_account_email = var.vertex_service_account_email
   time_zone                    = "UTC"
   schedule                     = "0 0 * * *"
-  cloud_scheduler_sa_email     = "my-cloud-scheduler-service-account@my-gcp-project-id.iam.gserviceaccount.com"
-  cloud_scheduler_job_name     = "my-first-pipeline"
+  cloud_scheduler_sa_email     = var.cloud_scheduler_sa_email
+  cloud_scheduler_job_name     = var.cloud_scheduler_job_name
 
 }
