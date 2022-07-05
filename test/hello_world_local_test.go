@@ -16,18 +16,8 @@ func TestHelloWorldLocal(t *testing.T) {
 		// Directory where main.tf for test is
 		TerraformDir: "../examples/hello_world_local",
 
-		// Variables to pass to our Terraform code using -var options
 		// Missing variables (project_id) will come from TF_VAR env variables
-		Vars: map[string]interface{}{
-			"pipeline_spec_path":           "pipeline.json",
-			"time_zone":                    "UTC",
-			"schedule":                     "0 0 1 1 *",
-			"cloud_scheduler_job_name":     "test-local-pipeline-definition",
-			"vertex_service_account_email": "vertex-pipeline-runner@my_project.iam.gserviceaccount.com",
-			"gcs_output_directory":         "gs://my_bucket/pipeline_root",
-			"vertex_region":                "europe-west2",
-			"cloud_scheduler_region":       "europe-west2",
-		},
+
 	})
 
 	defer terraform.Destroy(t, terraformOptions)
