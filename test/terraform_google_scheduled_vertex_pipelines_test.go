@@ -56,7 +56,7 @@ func TestHelloWorldGCS(t *testing.T) {
 
 	storage_ctx := context.Background()
 	storage_client, _ := storage.NewClient(storage_ctx)
-	w := storage_client.Bucket(bucketName).Object(objectName).NewWriter(ctx)
+	w := storage_client.Bucket(bucketName).Object(objectName).NewWriter(storage_ctx)
 	w.ContentType = "application/json"
 
 	io.Copy(w, body)
