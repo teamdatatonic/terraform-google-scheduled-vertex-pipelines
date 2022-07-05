@@ -1,10 +1,3 @@
-# Upload pipeline spec to GCS
-resource "google_storage_bucket_object" "pipeline_spec" {
-  name   = var.object_name
-  source = "pipeline.json"
-  bucket = var.gcs_bucket
-}
-
 module "hello_world_pipeline" {
   source                 = "../../"
   project                = var.project
@@ -19,8 +12,5 @@ module "hello_world_pipeline" {
   time_zone                    = "UTC"
   schedule                     = "0 0 * * *"
   cloud_scheduler_job_name     = "pipeline-from-local-spec"
-  depends_on = [
-    google_storage_bucket_object.pipeline_spec
-  ]
 
 }
