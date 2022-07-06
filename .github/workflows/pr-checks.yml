@@ -51,10 +51,11 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Copy Google creds to a file
-        run: 'echo $GOOGLE_CREDENTIALS > key.json'
-        env:
-          GOOGLE_CREDENTIALS: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: Copy pipeline.json to GCS
+        run: "gsutil cp test/pipeline.json gs://${{ secrets.TEST_BUCKET }}/terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
 
       - name: Run Terratest
         run: GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json" make test
@@ -62,6 +63,10 @@ jobs:
           TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
           TF_VAR_gcs_bucket: ${{ secrets.TEST_BUCKET }}
           TF_VAR_object_name: "terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
+
+      - name: Delete pipeline.json from GCS after test
+        if: always()
+        run: "gsutil rm gs://${{ secrets.TEST_BUCKET }}/terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
 
   generate-readme:
     runs-on: ubuntu-latest
