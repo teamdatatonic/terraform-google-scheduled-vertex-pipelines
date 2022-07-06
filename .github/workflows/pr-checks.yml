@@ -58,7 +58,7 @@ jobs:
         run: "gsutil cp test/pipeline.json gs://${{ secrets.TEST_BUCKET }}/terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
 
       - name: Run Terratest
-        run: GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json" make test
+        run: make test
         env:
           TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
           TF_VAR_gcs_bucket: ${{ secrets.TEST_BUCKET }}
