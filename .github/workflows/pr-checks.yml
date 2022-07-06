@@ -51,8 +51,13 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
+      - name: Copy Google creds to a file
+        run: 'echo $GOOGLE_CREDENTIALS > key.json'
+        env:
+          GOOGLE_CREDENTIALS: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
       - name: Run Terratest
-        run: make test
+        run: GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json" make test
         env:
           TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
           TF_VAR_gcs_bucket: ${{ secrets.TEST_BUCKET }}
