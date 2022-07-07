@@ -6,4 +6,4 @@ help: ## Display this help screen
 test: ## Run terratest against the examples
 	@cd test && \
 	go mod download && \
-	go test -v -timeout=10m hello_world_local_test.go
+	go test -v -timeout=10m terraform_google_scheduled_vertex_pipelines_test.go
