@@ -71,6 +71,7 @@ jobs:
           TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
           TF_VAR_gcs_bucket: ${{ secrets.TEST_BUCKET }}
           TF_VAR_object_name: "terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
+          TF_VAR_ar_repository: ${{ secrets.TEST_AR_REPO }}
 
       - name: Delete pipeline.json from GCS after test
         if: always()
