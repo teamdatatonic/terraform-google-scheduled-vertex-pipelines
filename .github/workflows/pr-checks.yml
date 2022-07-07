@@ -63,7 +63,7 @@ jobs:
           -H "Authorization: Bearer $(gcloud auth print-access-token)" \
           -F tags=latest \
           -F content=@test/pipeline.yaml \
-          https://europe-west2-kfp.pkg.dev/${{ secrets.TEST_PROJECT_ID }}/${{ secrets.TEST_AR_REPO }}
+          "https://europe-west2-kfp.pkg.dev/${{ secrets.TEST_PROJECT_ID }}/${{ secrets.TEST_AR_REPO }}"
 
       - name: Run Terratest
         run: make test
