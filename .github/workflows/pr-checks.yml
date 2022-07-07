@@ -57,12 +57,21 @@ jobs:
       - name: Copy pipeline.json to GCS
         run: "gsutil cp test/pipeline.json gs://${{ secrets.TEST_BUCKET }}/terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
 
+      - name: Copy pipeline.yaml to AR
+        run: >
+          curl -X POST
+          -H "Authorization: Bearer $(gcloud auth print-access-token)"
+          -F tags=latest
+          -F content=@test/pipeline.yaml
+          "https://europe-west2-kfp.pkg.dev/${{ secrets.TEST_PROJECT_ID }}/${{ secrets.TEST_AR_REPO }}"
+
       - name: Run Terratest
         run: make test
         env:
           TF_VAR_project: ${{ secrets.TEST_PROJECT_ID }}
           TF_VAR_gcs_bucket: ${{ secrets.TEST_BUCKET }}
           TF_VAR_object_name: "terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
+          TF_VAR_ar_repository: ${{ secrets.TEST_AR_REPO }}
 
       - name: Delete pipeline.json from GCS after test
         if: always()

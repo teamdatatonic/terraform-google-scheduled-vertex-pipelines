@@ -4,23 +4,45 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 4.0.0"
     }
+
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 2.2.0"
+    }
   }
 }
 
 locals {
-  # var.pipeline_spec_path minus gs:// prefix (if prefix exists)
-  pipeline_spec_path_no_gcs_prefix = trimprefix(var.pipeline_spec_path, "gs://")
+  # Regex explanation:
 
-  # is var.pipeline_spec_path a GCS path? (i.e. has trimming the prefix made a difference?)
-  pipeline_spec_path_is_gcs_path = (var.pipeline_spec_path != local.pipeline_spec_path_no_gcs_prefix)
+  # Starts with named group "scheme"
+  # either "https://" ("http_scheme") (for Artifact registry pipeline spec)
+  # or "gs://" ("gs://") (for GCS pipeline spec)
+  # or nothing
 
-  # split the path into parts by "/"
-  pipeline_spec_path_no_gcs_prefix_parts = split("/", local.pipeline_spec_path_no_gcs_prefix)
+  # Next part is named group "root"
+  # For GCS path "root" = bucket name
+  # otherwise it's just the first part of the path (minus prefix)
+
+  # Next named group is "rest_of_path_including_slash"
+  # This consists of two named groups:
+  # 1) a forward slash (named group "slash")
+  # 2) rest of the string (named group "rest_of_path")
+  # For GCS pipeline spec "rest_of_path" = GCS object name
+  pipeline_spec_path = regex("^(?P<scheme>(?P<http_scheme>https\\:\\/\\/)|(?P<gs_scheme>gs\\:\\/\\/))?(?P<root>[\\w.-]*)?(?P<rest_of_path_including_slash>(?P<slash>\\/)(?P<rest_of_path>.*))*", var.pipeline_spec_path)
+
+  pipeline_spec_path_is_gcs_path   = local.pipeline_spec_path.scheme == "gs://"
+  pipeline_spec_path_is_ar_path    = local.pipeline_spec_path.scheme == "https://"
+  pipeline_spec_path_is_local_path = local.pipeline_spec_path.scheme == null
 
   # Load the pipeline spec from YAML/JSON
   # If it's a GCS path, load it from the GCS object content
+  # If it's an AR path, load it from Artifact registry
   # If it's a local path, load from the local file
-  pipeline_spec = yamldecode(local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content : file(var.pipeline_spec_path))
+  pipeline_spec = yamldecode(
+    local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content :
+    (local.pipeline_spec_path_is_ar_path ? data.http.pipeline_spec[0].response_body :
+  file(var.pipeline_spec_path)))
 
   # If var.kms_key_name is provided, construct the encryption_spec object
   encryption_spec = (var.kms_key_name == null) ? null : { "kmsKeyName" : var.kms_key_name }
@@ -48,8 +70,25 @@ locals {
 # Load the pipeline spec from the GCS path
 data "google_storage_bucket_object_content" "pipeline_spec" {
   count  = local.pipeline_spec_path_is_gcs_path ? 1 : 0
-  name   = join("/", slice(local.pipeline_spec_path_no_gcs_prefix_parts, 1, length(local.pipeline_spec_path_no_gcs_prefix_parts)))
-  bucket = local.pipeline_spec_path_no_gcs_prefix_parts[0]
+  name   = local.pipeline_spec_path.rest_of_path
+  bucket = local.pipeline_spec_path.root
+}
+
+# If var.pipeline_spec_path is an Artifact Registry (https) path
+# We will need the authorization token
+data "google_client_config" "default" {
+  count = local.pipeline_spec_path_is_ar_path ? 1 : 0
+}
+
+# If var.pipeline_spec_path is an Artifact Registry (https) path
+# Load the pipeline spec from AR (over HTTPS) using authorization token
+data "http" "pipeline_spec" {
+  count = local.pipeline_spec_path_is_ar_path ? 1 : 0
+  url   = var.pipeline_spec_path
+
+  request_headers = {
+    Authorization = "Bearer ${data.google_client_config.default[0].access_token}"
+  }
 }
 
 # If a service account is not specified for Cloud Scheduler, use the default compute service account

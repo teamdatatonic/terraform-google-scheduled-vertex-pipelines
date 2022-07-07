@@ -21,7 +21,7 @@ variable "display_name" {
 
 variable "pipeline_spec_path" {
   type        = string
-  description = "Path to the KFP pipeline spec file (YAML or JSON). This can be a local or a GCS path."
+  description = "Path to the KFP pipeline spec file (YAML or JSON). This can be a local file, GCS path, or Artifact Registry path."
 }
 
 variable "labels" {
