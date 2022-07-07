@@ -47,8 +47,8 @@ You can customise the template (including this text for example) in `.github/wor
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.27.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | 2.2.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 4.0.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | >= 2.2.0 |
 
 ## Modules
 
