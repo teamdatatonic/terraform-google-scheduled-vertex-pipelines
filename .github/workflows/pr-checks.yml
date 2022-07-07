@@ -58,7 +58,7 @@ jobs:
         run: "gsutil cp test/pipeline.json gs://${{ secrets.TEST_BUCKET }}/terraform-google-scheduled-vertex-pipelines/${{ github.run_id }}/pipeline.json"
 
       - name: Copy pipeline.yaml to AR
-        run: |
+        run: >
           curl -X POST
           -H "Authorization: Bearer $(gcloud auth print-access-token)"
           -F tags=latest
