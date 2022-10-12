@@ -38,10 +38,22 @@ locals {
   # If it's a GCS path, load it from the GCS object content
   # If it's an AR path, load it from Artifact registry
   # If it's a local path, load from the local file
-  pipeline_spec = yamldecode(
+  pipeline_file_contents = yamldecode(
     local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content :
     (local.pipeline_spec_path_is_ar_path ? data.http.pipeline_spec[0].response_body :
   file(var.pipeline_spec_path)))
+
+  # Look up runtimeConfig and pipelineSpec from the compiled pipeline definition
+  # Sometimes the pipelineSpec is the root component, and runtimeConfig is not present
+  runtime_config_from_file = lookup(local.pipeline_file_contents, "runtimeConfig", {})
+  pipeline_spec_from_file  = lookup(local.pipeline_file_contents, "pipelineSpec", local.pipeline_file_contents)
+
+  # Merge runtime config from file + terraform vars here
+  # Terraform vars take priority
+  runtime_config = merge(local.runtime_config_from_file, {
+    parameterValues    = var.parameter_values
+    gcsOutputDirectory = var.gcs_output_directory
+  })
 
   # If var.kms_key_name is provided, construct the encryption_spec object
   encryption_spec = (var.kms_key_name == null) ? null : { "kmsKeyName" : var.kms_key_name }
@@ -49,18 +61,13 @@ locals {
   # Construct the PipelineJob object
   # https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.pipelineJobs
   pipeline_job = {
-    displayName  = var.display_name
-    pipelineSpec = local.pipeline_spec
-    labels       = var.labels
-    runtimeConfig = {
-      parameterValues    = var.parameter_values
-      gcsOutputDirectory = var.gcs_output_directory
-
-    }
+    displayName    = var.display_name
+    pipelineSpec   = local.pipeline_spec_from_file
+    labels         = var.labels
+    runtimeConfig  = local.runtime_config
     encryptionSpec = local.encryption_spec
     serviceAccount = var.vertex_service_account_email
     network        = var.network
-
   }
 
 }
