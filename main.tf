@@ -93,7 +93,6 @@ data "http" "pipeline_spec" {
 
 # If a service account is not specified for Cloud Scheduler, use the default compute service account
 data "google_compute_default_service_account" "default" {
-  count   = (var.cloud_scheduler_sa_email == null) ? 1 : 0
   project = var.project
 }
 
@@ -116,7 +115,7 @@ resource "google_cloud_scheduler_job" "job" {
     body        = base64encode(jsonencode(local.pipeline_job))
 
     oauth_token {
-      service_account_email = (var.cloud_scheduler_sa_email == null) ? data.google_compute_default_service_account.default[0].email : var.cloud_scheduler_sa_email
+      service_account_email = (var.cloud_scheduler_sa_email == null) ? data.google_compute_default_service_account.default.email : var.cloud_scheduler_sa_email
     }
 
   }
