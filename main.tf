@@ -31,9 +31,8 @@ locals {
   # For GCS pipeline spec "rest_of_path" = GCS object name
   pipeline_spec_path = regex("^(?P<scheme>(?P<http_scheme>https\\:\\/\\/)|(?P<gs_scheme>gs\\:\\/\\/))?(?P<root>[\\w.-]*)?(?P<rest_of_path_including_slash>(?P<slash>\\/)(?P<rest_of_path>.*))*", var.pipeline_spec_path)
 
-  pipeline_spec_path_is_gcs_path   = local.pipeline_spec_path.scheme == "gs://"
-  pipeline_spec_path_is_ar_path    = local.pipeline_spec_path.scheme == "https://"
-  pipeline_spec_path_is_local_path = local.pipeline_spec_path.scheme == null
+  pipeline_spec_path_is_gcs_path = local.pipeline_spec_path.scheme == "gs://"
+  pipeline_spec_path_is_ar_path  = local.pipeline_spec_path.scheme == "https://"
 
   # Load the pipeline spec from YAML/JSON
   # If it's a GCS path, load it from the GCS object content
@@ -93,7 +92,6 @@ data "http" "pipeline_spec" {
 
 # If a service account is not specified for Cloud Scheduler, use the default compute service account
 data "google_compute_default_service_account" "default" {
-  count   = (var.cloud_scheduler_sa_email == null) ? 1 : 0
   project = var.project
 }
 
@@ -116,7 +114,7 @@ resource "google_cloud_scheduler_job" "job" {
     body        = base64encode(jsonencode(local.pipeline_job))
 
     oauth_token {
-      service_account_email = (var.cloud_scheduler_sa_email == null) ? data.google_compute_default_service_account.default[0].email : var.cloud_scheduler_sa_email
+      service_account_email = (var.cloud_scheduler_sa_email == null) ? data.google_compute_default_service_account.default.email : var.cloud_scheduler_sa_email
     }
 
   }
