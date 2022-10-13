@@ -8,6 +8,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	schedulerpb "google.golang.org/genproto/googleapis/cloud/scheduler/v1beta1"
+	"google.golang.org/grpc/codes"
 )
 
 func TestHelloWorldLocal(t *testing.T) {
@@ -46,12 +47,10 @@ func TestHelloWorldLocal(t *testing.T) {
 		Name: cloud_scheduler_job_id,
 	}
 
-	// resp2, err := c.RunJob(ctx, req2)
-	_, err := c.RunJob(ctx, req2)
+	resp2, err := c.RunJob(ctx, req2)
 
 	assert.Equal(t, nil, err)
-	const expected_code int32 = 200
-	// assert.Equal(t, expected_code, resp2.Status.Code)
+	assert.Equal(t, codes.OK, resp2.Status.Code)
 
 }
 
@@ -96,11 +95,10 @@ func TestHelloWorldNestedPipelineSpecLocal(t *testing.T) {
 	}
 
 	// resp2, err := c.RunJob(ctx, req2)
-	_, err := c.RunJob(ctx, req2)
+	resp2, err := c.RunJob(ctx, req2)
 
 	assert.Equal(t, nil, err)
-	const expected_code int32 = 200
-	// assert.Equal(t, expected_code, resp2.Status.Code)
+	assert.Equal(t, codes.OK, resp2.Status.Code)
 
 }
 
