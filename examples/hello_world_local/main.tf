@@ -3,7 +3,7 @@ module "hello_world_pipeline" {
   project                = var.project
   vertex_region          = "europe-west2"
   cloud_scheduler_region = "europe-west2"
-  pipeline_spec_path     = "pipeline.json"
+  pipeline_spec_path     = var.pipeline_spec_path
   parameter_values = {
     "text" = "Hello, world!"
   }
