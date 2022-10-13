@@ -48,8 +48,8 @@ func TestHelloWorldLocal(t *testing.T) {
 
 	resp2, err := c.RunJob(ctx, req2)
 
-	assert.Equal(t, err, nil)
-	assert.Equal(t, resp2.Status, 200)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 200, resp2.Status.Code)
 
 }
 
@@ -95,8 +95,8 @@ func TestHelloWorldNestedPipelineSpecLocal(t *testing.T) {
 
 	resp2, err := c.RunJob(ctx, req2)
 
-	assert.Equal(t, err, nil)
-	assert.Equal(t, resp2.Status, 200)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 200, resp2.Status.Code)
 
 }
 
