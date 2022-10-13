@@ -46,7 +46,8 @@ func TestHelloWorldLocal(t *testing.T) {
 		Name: cloud_scheduler_job_id,
 	}
 
-	resp2, err := c.RunJob(ctx, req2)
+	// resp2, err := c.RunJob(ctx, req2)
+	_, err := c.RunJob(ctx, req2)
 
 	assert.Equal(t, nil, err)
 	const expected_code int32 = 200
@@ -94,7 +95,8 @@ func TestHelloWorldNestedPipelineSpecLocal(t *testing.T) {
 		Name: cloud_scheduler_job_id,
 	}
 
-	resp2, err := c.RunJob(ctx, req2)
+	// resp2, err := c.RunJob(ctx, req2)
+	_, err := c.RunJob(ctx, req2)
 
 	assert.Equal(t, nil, err)
 	const expected_code int32 = 200
