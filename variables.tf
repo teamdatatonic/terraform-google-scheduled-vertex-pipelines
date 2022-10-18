@@ -30,9 +30,15 @@ variable "labels" {
   description = "The labels with user-defined metadata to organize PipelineJob. Label keys and values can be no longer than 64 characters (Unicode codepoints), can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. See https://goo.gl/xmQnxf for more information and examples of labels."
 }
 
+variable "parameters" {
+  type        = map(any)
+  default     = null
+  description = "Deprecated. Use RuntimeConfig.parameter_values instead. The runtime parameters of the PipelineJob. The parameters will be passed into PipelineJob.pipeline_spec to replace the placeholders at runtime. This field is used by pipelines built using PipelineJob.pipeline_spec.schema_version 2.0.0 or lower, such as pipelines built using Kubeflow Pipelines SDK 1.8 or lower."
+}
+
 variable "parameter_values" {
   type        = map(any)
-  default     = {}
+  default     = null
   description = "The runtime parameters of the PipelineJob. The parameters will be passed into PipelineJob.pipeline_spec to replace the placeholders at runtime. This field is used by pipelines built using PipelineJob.pipeline_spec.schema_version 2.1.0, such as pipelines built using Kubeflow Pipelines SDK 1.9 or higher and the v2 DSL."
 }
 
