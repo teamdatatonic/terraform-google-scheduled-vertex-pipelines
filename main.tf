@@ -51,9 +51,9 @@ locals {
   # Terraform vars take priority
   runtime_config = merge(
     lookup(local.pipeline_json, "runtimeConfig", {}), # Sometimes runtimeConfig is in the pipeline JSON/YAML, sometimes not
-    (var.parameters != null ? { parameters = var.parameters } : {}),
-    (var.parameter_values != null ? { parameterValues = var.parameter_values } : {}),
-    { gcsOutputDirectory = var.gcs_output_directory },
+    (var.parameters != null ? { "parameters" : var.parameters } : {}),
+    (var.parameter_values != null ? { "parameterValues" : var.parameter_values } : {}),
+    { "gcsOutputDirectory" : var.gcs_output_directory },
   )
 
   # If var.kms_key_name is provided, construct the encryption_spec object
