@@ -38,10 +38,23 @@ locals {
   # If it's a GCS path, load it from the GCS object content
   # If it's an AR path, load it from Artifact registry
   # If it's a local path, load from the local file
-  pipeline_spec = yamldecode(
+  pipeline_json = yamldecode(
     local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content :
     (local.pipeline_spec_path_is_ar_path ? data.http.pipeline_spec[0].response_body :
   file(var.pipeline_spec_path)))
+
+  # Look up pipelineSpec from the compiled pipeline definition
+  # Sometimes the pipelineSpec is the root component, sometimes it is a key within the root component
+  pipeline_spec = lookup(local.pipeline_json, "pipelineSpec", local.pipeline_json)
+
+  # Merge runtime config from file + terraform vars here
+  # Terraform vars take priority
+  runtime_config = merge(
+    lookup(local.pipeline_json, "runtimeConfig", {}), # Sometimes runtimeConfig is in the pipeline JSON/YAML, sometimes not
+    (var.parameters != null ? { "parameters" : var.parameters } : {}),
+    (var.parameter_values != null ? { "parameterValues" : var.parameter_values } : {}),
+    { "gcsOutputDirectory" : var.gcs_output_directory },
+  )
 
   # If var.kms_key_name is provided, construct the encryption_spec object
   encryption_spec = (var.kms_key_name == null) ? null : { "kmsKeyName" : var.kms_key_name }
@@ -49,18 +62,13 @@ locals {
   # Construct the PipelineJob object
   # https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.pipelineJobs
   pipeline_job = {
-    displayName  = var.display_name
-    pipelineSpec = local.pipeline_spec
-    labels       = var.labels
-    runtimeConfig = {
-      parameterValues    = var.parameter_values
-      gcsOutputDirectory = var.gcs_output_directory
-
-    }
+    displayName    = var.display_name
+    pipelineSpec   = local.pipeline_spec
+    labels         = var.labels
+    runtimeConfig  = local.runtime_config
     encryptionSpec = local.encryption_spec
     serviceAccount = var.vertex_service_account_email
     network        = var.network
-
   }
 
 }
