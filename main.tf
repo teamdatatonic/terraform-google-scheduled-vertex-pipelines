@@ -35,7 +35,7 @@ locals {
   # If it's a local path, load from the local file
   pipeline_json = (
     local.pipeline_spec_path_is_gcs_path ? yamldecode(data.google_storage_bucket_object_content.pipeline_spec[0].content) : (
-      local.pipeline_spec_path_is_ar_path ? object({}) :
+      local.pipeline_spec_path_is_ar_path ? map({}) :
       yamldecode(file(var.pipeline_spec_path))
     )
   )
