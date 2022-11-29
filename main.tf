@@ -4,11 +4,6 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 4.0.0"
     }
-
-    http = {
-      source  = "hashicorp/http"
-      version = ">= 2.2.0"
-    }
   }
 }
 
@@ -36,16 +31,21 @@ locals {
 
   # Load the pipeline spec from YAML/JSON
   # If it's a GCS path, load it from the GCS object content
-  # If it's an AR path, load it from Artifact registry
+  # If it's an AR path, leave pipelineSpec blank (and use the templateUri field)
   # If it's a local path, load from the local file
-  pipeline_json = yamldecode(
-    local.pipeline_spec_path_is_gcs_path ? data.google_storage_bucket_object_content.pipeline_spec[0].content :
-    (local.pipeline_spec_path_is_ar_path ? data.http.pipeline_spec[0].response_body :
-  file(var.pipeline_spec_path)))
+  pipeline_json = (
+    local.pipeline_spec_path_is_gcs_path ? yamldecode(data.google_storage_bucket_object_content.pipeline_spec[0].content) : (
+      local.pipeline_spec_path_is_ar_path ? {} :
+      yamldecode(file(var.pipeline_spec_path))
+    )
+  )
 
   # Look up pipelineSpec from the compiled pipeline definition
   # Sometimes the pipelineSpec is the root component, sometimes it is a key within the root component
   pipeline_spec = lookup(local.pipeline_json, "pipelineSpec", local.pipeline_json)
+
+  # fill templateUri field if we are using an AR path
+  templateUri = local.pipeline_spec_path_is_ar_path ? var.pipeline_spec_path : null
 
   # Merge runtime config from file + terraform vars here
   # Terraform vars take priority
@@ -62,13 +62,15 @@ locals {
   # Construct the PipelineJob object
   # https://cloud.google.com/vertex-ai/docs/reference/rest/v1/projects.locations.pipelineJobs
   pipeline_job = {
-    displayName    = var.display_name
-    pipelineSpec   = local.pipeline_spec
+    displayName = var.display_name
+    # empty pipelineSpec (i.e. using templateUri) should be null
+    pipelineSpec   = (local.pipeline_spec == {} ? null : local.pipeline_spec)
     labels         = var.labels
     runtimeConfig  = local.runtime_config
     encryptionSpec = local.encryption_spec
     serviceAccount = var.vertex_service_account_email
     network        = var.network
+    templateUri    = local.templateUri
   }
 
 }
@@ -79,23 +81,6 @@ data "google_storage_bucket_object_content" "pipeline_spec" {
   count  = local.pipeline_spec_path_is_gcs_path ? 1 : 0
   name   = local.pipeline_spec_path.rest_of_path
   bucket = local.pipeline_spec_path.root
-}
-
-# If var.pipeline_spec_path is an Artifact Registry (https) path
-# We will need the authorization token
-data "google_client_config" "default" {
-  count = local.pipeline_spec_path_is_ar_path ? 1 : 0
-}
-
-# If var.pipeline_spec_path is an Artifact Registry (https) path
-# Load the pipeline spec from AR (over HTTPS) using authorization token
-data "http" "pipeline_spec" {
-  count = local.pipeline_spec_path_is_ar_path ? 1 : 0
-  url   = var.pipeline_spec_path
-
-  request_headers = {
-    Authorization = "Bearer ${data.google_client_config.default[0].access_token}"
-  }
 }
 
 # If a service account is not specified for Cloud Scheduler, use the default compute service account
